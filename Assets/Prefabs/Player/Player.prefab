@@ -2195,10 +2195,6 @@ MonoBehaviour:
   playerIndex: 0
   moveSpeed: 3
   gravity: -9.81
-  knockbackSpeed: 10
-  knockbackSpeedMultipiler: 1
-  knockbackDuration: 1
-  knockbackDirection: {x: 0, y: 0, z: 0}
   knockBackSettings:
   - knockBackType: 0
     knockbackSpeed: 12
@@ -2210,6 +2206,10 @@ MonoBehaviour:
     knockbackSpeedMultipiler: 1
     knockbackDuration: 0.5
     knockbackDirection: {x: 0, y: 0, z: -1}
+  dashMoveSpeed: 8
+  dashMoveSpeedMultipiler: 1
+  dashDuration: 0.15
+  dashCooldown: 0.85
   horizontalAnimSmoothTime: 0.2
   verticalAnimTime: 0.2
   startAnimTime: 0.3

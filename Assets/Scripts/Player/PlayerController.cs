@@ -27,6 +27,12 @@ namespace Game
         [Header("Setting - Knockback Movement")]
         [SerializeField] private KnockBackSetting[] knockBackSettings;
         
+        [Header("Setting - Dash Movement")]
+        [SerializeField] private float dashMoveSpeed = 5.0f;
+        [SerializeField] float dashMoveSpeedMultipiler = 1.0f;
+        [SerializeField] float dashDuration = 1.0f;
+        [SerializeField] float dashCooldown = 1.0f;
+        
         [Header("Animation Smoothing")]
         [Range(0, 1f)] [SerializeField] private float horizontalAnimSmoothTime = 0.2f;
         [Range(0, 1f)] [SerializeField] private float verticalAnimTime = 0.2f;
@@ -58,9 +64,10 @@ namespace Game
         
         // Dash Status
         private bool IsDash => (Time.time <= dashTimer);
-        private bool CanDash => characterState.isMoveable && characterState.isGrounded && !IsKnockBack && !IsImmobilize;
+        private bool CanDash => (Time.time >= dashCooldownTimer) && characterState.isMoveable && characterState.isGrounded && !IsKnockBack && !IsImmobilize && !IsDash;
         private float dashTimer = 0.0f;
         private float dashCooldownTimer = 0.0f;
+        private Vector3 dashDirection = Vector3.forward;
         
         // Immobilize Status
         private bool IsImmobilize => false; // TODO
@@ -97,6 +104,7 @@ namespace Game
         {
             AnimationHandler();
             MoveHandler();
+            SkillHandler();
 
             #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -110,7 +118,7 @@ namespace Game
             }
             else if (Input.GetKeyDown(KeyCode.Alpha3))
             {
-                Dash(Vector3.forward);
+                Dash(transform.forward);
             }
             #endif
         }
@@ -177,12 +185,19 @@ namespace Game
             float currentMoveSpeedMultiplier = 1.0f;
             
             bool shouldUseKnockback = (Time.time <= knockbackTimer);
+            bool shouldUseDash = (Time.time <= dashTimer);
             
             if (shouldUseKnockback)
             {
                 currentMoveDirection = currentKnockbackSetting.knockbackDirection;
                 currentMoveSpeed = currentKnockbackSetting.knockbackSpeed;
                 currentMoveSpeedMultiplier = currentKnockbackSetting.knockbackSpeedMultipiler;
+            }
+            else if (shouldUseDash)
+            {
+                 currentMoveDirection = dashDirection;
+                 currentMoveSpeed = dashMoveSpeed;
+                 currentMoveSpeedMultiplier = dashMoveSpeedMultipiler;               
             }
             else if (characterState.isMoveable)
             {
@@ -216,6 +231,13 @@ namespace Game
             characterController.Move(velocity);
         }
 
+        private void SkillHandler()
+        {
+            // Dash
+            
+            // Punch
+        }
+        
         private void RotateHandler()
         {
             Quaternion lookDirection = Quaternion.LookRotation(lastNonZeroDesiredMoveDirection);
@@ -230,15 +252,14 @@ namespace Game
             knockbackTimer = (Time.time + currentKnockbackSetting.knockbackDuration);
         }
 
-        // TODO
         public void Dash(Vector3 dashDirection)
         {
-            if (!CanDash)
+            if (CanDash)
             {
-                return;
+                this.dashDirection = dashDirection;
+                dashTimer = (Time.time + dashDuration);
+                dashCooldownTimer = (Time.time + dashCooldown);
             }
-            
-            // TODO
         }
     }
 }
