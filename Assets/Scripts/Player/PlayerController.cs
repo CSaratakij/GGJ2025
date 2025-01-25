@@ -11,6 +11,7 @@ namespace Game
         private const float DESIRED_ROTATION_SPEED = 0.1f;
         
         [Header("Setting")]
+        [SerializeField] private int playerIndex = 0;
         [SerializeField] private float velocity = 5.0f;
         
         [Header("Animation Smoothing")]
@@ -20,18 +21,20 @@ namespace Game
         [Range(0, 1f)] [SerializeField] private float stopAnimTime = 0.15f;
         
         private bool isGrouned;
-        private Camera mainCamera;
-        private CharacterController characterController;
-        private Animator animator;
         private Vector3 inputVector;
         private Vector3 moveVector;
         private Vector3 desiredMoveDirection;
         private Vector3 lastNonZeroDesiredMoveDirection;
+        private Animator animator;
+        private Camera mainCamera;
+        private CharacterController characterController;
+        private CharacterSkinControllerLite characterSkinControllerLite;
         private PlayerInput playerInput;
 
         private void Awake()
         {
-            characterController = GetComponent<CharacterController> ();
+            characterController = GetComponent<CharacterController>();
+            characterSkinControllerLite = GetComponent<CharacterSkinControllerLite>();
             animator = GetComponent<Animator>();
             playerInput = GetComponent<PlayerInput>();
         }
@@ -40,6 +43,7 @@ namespace Game
         {
             mainCamera = Camera.main;
             lastNonZeroDesiredMoveDirection = Vector3.forward;
+            characterSkinControllerLite.ChangeMaterialSettings(playerIndex);
         }
 
         private void Update()

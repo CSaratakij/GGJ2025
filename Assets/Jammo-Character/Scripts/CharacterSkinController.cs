@@ -21,7 +21,7 @@ public class CharacterSkinController : MonoBehaviour
         
     }
 
-    // Update is called once per frame
+    #if UNITY_EDITOR
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -49,6 +49,7 @@ public class CharacterSkinController : MonoBehaviour
             ChangeAnimatorIdle("dead");
         }
     }
+    #endif
 
     void ChangeAnimatorIdle(string trigger)
     {
