@@ -2193,7 +2193,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerIndex: 0
-  velocity: 3
+  moveSpeed: 3
+  gravity: -9.81
+  knockbackSpeed: 10
+  knockbackSpeedMultipiler: 1
+  knockbackDuration: 1
+  knockbackDirection: {x: 0, y: 0, z: 0}
+  knockBackSettings:
+  - knockBackType: 0
+    knockbackSpeed: 12
+    knockbackSpeedMultipiler: 1
+    knockbackDuration: 0.25
+    knockbackDirection: {x: 0, y: 0, z: -1}
+  - knockBackType: 1
+    knockbackSpeed: 30
+    knockbackSpeedMultipiler: 1
+    knockbackDuration: 0.5
+    knockbackDirection: {x: 0, y: 0, z: -1}
   horizontalAnimSmoothTime: 0.2
   verticalAnimTime: 0.2
   startAnimTime: 0.3
