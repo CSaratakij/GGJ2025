@@ -12,7 +12,8 @@ namespace Game
         
         [Header("Setting")]
         [SerializeField] private int playerIndex = 0;
-        [SerializeField] private float velocity = 5.0f;
+        [SerializeField] private float moveSpeed = 5.0f;
+        [SerializeField] private float gravity = -9.81f;
         
         [Header("Animation Smoothing")]
         [Range(0, 1f)] [SerializeField] private float horizontalAnimSmoothTime = 0.2f;
@@ -20,9 +21,10 @@ namespace Game
         [Range(0,1f)] [SerializeField] private float startAnimTime = 0.3f;
         [Range(0, 1f)] [SerializeField] private float stopAnimTime = 0.15f;
         
-        private bool isGrouned;
+        private bool isGrounded;
+        private bool isMovable = true;
+        private Vector2 gravityVector;
         private Vector3 inputVector;
-        private Vector3 moveVector;
         private Vector3 desiredMoveDirection;
         private Vector3 lastNonZeroDesiredMoveDirection;
         private Animator animator;
@@ -80,7 +82,7 @@ namespace Game
         
         private void MoveHandler()
         {
-            isGrouned = characterController.isGrounded;
+            isGrounded = characterController.isGrounded;
 
             Vector3 forwardBasis = mainCamera.transform.forward;
             Vector3 rightBasis = mainCamera.transform.right;
@@ -97,8 +99,20 @@ namespace Game
             {
                 lastNonZeroDesiredMoveDirection = desiredMoveDirection;
             }
+
+            bool shouldResetGravity = isGrounded && (gravityVector.y < 0.0f);
             
-            characterController.Move(desiredMoveDirection * (Time.deltaTime * velocity));
+            if (shouldResetGravity)
+            {
+                gravityVector = Vector3.zero;
+            }
+            
+            gravityVector.y = (gravity * Time.deltaTime);
+            
+            Vector3 velocity = desiredMoveDirection * (Time.deltaTime * moveSpeed);
+            velocity.y = gravityVector.y;
+            
+            characterController.Move(velocity);
         }
 
         private void RotateHandler()

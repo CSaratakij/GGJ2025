@@ -19,6 +19,7 @@ namespace  Game
             characterMaterials = GetComponentsInChildren<Renderer>();
         }
 
+        /*
         #if UNITY_EDITOR
         private void Update()
         {
@@ -48,6 +49,7 @@ namespace  Game
             }
         }
         #endif
+        */
 
         void ChangeAnimatorIdle(string trigger)
         {
@@ -61,7 +63,6 @@ namespace  Game
                 if (characterMaterials[i].transform.CompareTag("PlayerEyes"))
                     characterMaterials[i].material.SetColor("_EmissionColor", eyeColors[index]);
                 else
-                    //characterMaterials[i].material.SetTexture("_MainTex", albedoList[index]);
                     characterMaterials[i].material.SetTexture("_BaseMap", albedoList[index]);
             }
         }
