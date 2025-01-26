@@ -15,7 +15,7 @@ namespace Game
     [RequireComponent(typeof(CharacterController))]
     public class PlayerController : MonoBehaviour, IKnockback, IImmobilize
     {
-        public event Action OnDead;
+        public event Action<int, int> OnDead;
         
         private const float ALLOW_PLAYER_ROTATION = 0.1f;
         private const float DESIRED_ROTATION_SPEED = 0.1f;
@@ -61,6 +61,9 @@ namespace Game
         [Range(0, 1f)] [SerializeField] private float verticalAnimTime = 0.2f;
         [Range(0,1f)] [SerializeField] private float startAnimTime = 0.3f;
         [Range(0, 1f)] [SerializeField] private float stopAnimTime = 0.15f;
+        
+        public int PlayerIndex => playerIndex;
+        public int KnockBackCauserPlayerIndex => knockbackCauserPlayerIndex;
 
         [Serializable]
         public struct CharacterState
@@ -115,6 +118,8 @@ namespace Game
         private bool IsInvincible => (Time.time <= respawnInvincibleTimer) || IsDash;
         private float respawnInvincibleTimer = 0.0f;
         
+        // General
+        private int knockbackCauserPlayerIndex = -1;
         private Vector3 originalSpawnPosition;
         private CharacterState characterState;
         private Vector2 gravityVector;
@@ -162,6 +167,7 @@ namespace Game
             MoveHandler();
             ActionActivationHandler();
 
+            /*
             #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
@@ -181,6 +187,7 @@ namespace Game
                 Immobilize();
             }
             #endif
+            */
         }
         
         private void LateUpdate()
@@ -248,7 +255,7 @@ namespace Game
 
         public void ForceDead()
         {
-            OnDead?.Invoke();
+            OnDead?.Invoke(PlayerIndex, KnockBackCauserPlayerIndex);
             Respawn();
         }
         
@@ -386,8 +393,9 @@ namespace Game
             transform.rotation = Quaternion.Slerp (transform.rotation, lookDirection, DESIRED_ROTATION_SPEED);
         }
 
-        public void Knockback(Vector3 knockbackDirection)
+        public void Knockback(Vector3 knockbackDirection, int casuerPlayerIndex)
         {
+            knockbackCauserPlayerIndex = casuerPlayerIndex;
             var knockbackType = IsImmobilize ? KnockBackType.High : KnockBackType.Normal;
             Knockback(knockbackDirection, knockbackType);
         }
@@ -465,7 +473,7 @@ namespace Game
                             knockbackDirection.Normalize();
                         }
                         
-                        knockbackAffector.Knockback(knockbackDirection);
+                        knockbackAffector.Knockback(knockbackDirection, PlayerIndex);
                     }
                     
                     Debug.Log($"Punch : {target.gameObject.name}", target.gameObject);
@@ -484,8 +492,8 @@ namespace Game
             shootTimer = (Time.time + shootDuration);
             shootCooldownTimer = (Time.time + shootCooldown);
             
-            animator.ResetTrigger("shoot");
-            animator.SetTrigger("shoot");
+            //animator.ResetTrigger("shoot");
+            //animator.SetTrigger("shoot");
 
             bool isValid = (shootMuzzleOrigin != null) && (bulletPrefab != null);
 
