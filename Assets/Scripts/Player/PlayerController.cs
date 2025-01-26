@@ -145,6 +145,7 @@ namespace Game
         private Animator animator;
         private AudioSource audioSource;
         private Camera mainCamera;
+        private CameraShake cameraShake;
         private CharacterController characterController;
         private CharacterSkinControllerLite characterSkinControllerLite;
         private PlayerInput playerInput;
@@ -172,6 +173,12 @@ namespace Game
         private void Start()
         {
             mainCamera = Camera.main;
+
+            if (mainCamera)
+            {
+                cameraShake = mainCamera.GetComponent<CameraShake>();
+            }
+            
             originalSpawnPosition = transform.position;
             lastNonZeroDesiredMoveDirection = Vector3.forward;
             characterSkinControllerLite.ChangeMaterialSettings(playerIndex);
@@ -186,11 +193,9 @@ namespace Game
             MoveHandler();
             ActionActivationHandler();
 
-            /*
             #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                //characterState.isMoveable = !characterState.isMoveable;
                 Knockback(-Vector3.forward, KnockBackType.Normal);
             }
             else if (Input.GetKeyDown(KeyCode.Alpha2))
@@ -201,12 +206,11 @@ namespace Game
             {
                 Dash(transform.forward);
             }
-            else if (Input.GetKeyDown(KeyCode.Alpha4))
+            else if (Input.GetKeyDown(KeyCode.Alpha0))
             {
-                Immobilize();
+                ShakeCamera();
             }
             #endif
-            */
         }
         
         private void LateUpdate()
@@ -420,6 +424,13 @@ namespace Game
 
             var sfxType = (knockbackType == KnockBackType.High) ? SFXAudioClip.KnockbackHigh : SFXAudioClip.KnockbackNormal;
             PlaySFX(sfxType);
+
+            bool shouldShakeCamera = (knockbackType == KnockBackType.High);
+
+            if (shouldShakeCamera)
+            {
+                ShakeCamera();
+            }
             
             Knockback(knockbackDirection, knockbackType);
         }
@@ -572,6 +583,14 @@ namespace Game
             }
             
             audioSource.PlayOneShot(audioClip);
+        }
+
+        private void ShakeCamera()
+        {
+            if (cameraShake)
+            {
+                cameraShake.Shake();
+            }
         }
     }
 }
