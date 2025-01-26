@@ -65,6 +65,7 @@ namespace Game
         // Dash Status
         private bool IsDash => (Time.time <= dashTimer);
         private bool CanDash => (Time.time >= dashCooldownTimer) && characterState.isMoveable && characterState.isGrounded && !IsKnockBack && !IsImmobilize && !IsDash;
+        private bool isPressedDash = false;
         private float dashTimer = 0.0f;
         private float dashCooldownTimer = 0.0f;
         private Vector3 dashDirection = Vector3.forward;
@@ -135,6 +136,14 @@ namespace Game
             if (inputVector.magnitude > 1)
             {
                 inputVector.Normalize();
+            }
+        }
+
+        public void OnDash(InputAction.CallbackContext context)
+        {
+            if (!isPressedDash)
+            {
+                isPressedDash = true;
             }
         }
 
@@ -234,6 +243,11 @@ namespace Game
         private void SkillHandler()
         {
             // Dash
+            if (isPressedDash)
+            {
+                isPressedDash = false;
+                Dash(transform.forward);
+            }
             
             // Punch
         }
