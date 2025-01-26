@@ -63,10 +63,23 @@ namespace Game
         [Range(0.0f, 1.0f)] [SerializeField] private float verticalAnimTime = 0.2f;
         [Range(0.0f, 1.0f)] [SerializeField] private float startAnimTime = 0.3f;
         [Range(0.0f, 1.0f)] [SerializeField] private float stopAnimTime = 0.15f;
+
+        [Header("SFX")]
+        [SerializeField] private AudioClip[] audioClips;
         
         public int PlayerIndex => playerIndex;
         public int KnockBackCauserPlayerIndex => knockbackCauserPlayerIndex;
         public Color PlayerColor => playerColor;
+
+        public enum SFXAudioClip
+        {
+            KnockbackHigh,
+            KnockbackNormal,
+            ShootBubble,
+            Dash,
+            Dead,
+            Total = 5
+        }
 
         [Serializable]
         public struct CharacterState
@@ -130,6 +143,7 @@ namespace Game
         private Vector3 desiredMoveDirection;
         private Vector3 lastNonZeroDesiredMoveDirection;
         private Animator animator;
+        private AudioSource audioSource;
         private Camera mainCamera;
         private CharacterController characterController;
         private CharacterSkinControllerLite characterSkinControllerLite;
@@ -151,6 +165,7 @@ namespace Game
             characterController = GetComponent<CharacterController>();
             characterSkinControllerLite = GetComponent<CharacterSkinControllerLite>();
             animator = GetComponent<Animator>();
+            audioSource = GetComponent<AudioSource>();
             playerInput = GetComponent<PlayerInput>();
         }
 
@@ -260,6 +275,7 @@ namespace Game
         public void ForceDead()
         {
             OnDead?.Invoke(PlayerIndex, KnockBackCauserPlayerIndex);
+            PlaySFX(SFXAudioClip.Dead);
             Respawn();
         }
         
@@ -401,6 +417,10 @@ namespace Game
         {
             knockbackCauserPlayerIndex = casuerPlayerIndex;
             var knockbackType = IsImmobilize ? KnockBackType.High : KnockBackType.Normal;
+
+            var sfxType = (knockbackType == KnockBackType.High) ? SFXAudioClip.KnockbackHigh : SFXAudioClip.KnockbackNormal;
+            PlaySFX(sfxType);
+            
             Knockback(knockbackDirection, knockbackType);
         }
 
@@ -439,6 +459,7 @@ namespace Game
                 this.dashDirection = dashDirection;
                 dashTimer = (Time.time + dashDuration);
                 dashCooldownTimer = (Time.time + dashCooldown);
+                PlaySFX(SFXAudioClip.Dash);
             }
         }
 
@@ -514,6 +535,8 @@ namespace Game
                 bullet.ApplyColor(bulletColor);
                 bullet.StartOperation(moveDirection: transform.forward.normalized, moveSpeed: bulletMoveSpeed, lifeTime: bulletLifeTime, GetPlayerColor(alpha: 0.5f), owner: this.gameObject);
             }
+            
+            PlaySFX(SFXAudioClip.ShootBubble);
         }
 
         private Color GetPlayerColor(float alpha = 1.0f)
@@ -529,6 +552,26 @@ namespace Game
             {
                 visualImmobilizeRenderer.material.SetColor("_BaseColor", color);
             }
+        }
+
+        private void PlaySFX(SFXAudioClip sfxAudioClip)
+        {
+            int audioClipIndex = (int)sfxAudioClip;
+            bool isValid = (audioClipIndex >= 0) && (audioClipIndex < audioClips.Length);
+
+            if (!isValid)
+            {
+                return;
+            }
+
+            AudioClip audioClip = audioClips[audioClipIndex];
+
+            if (audioSource.isPlaying)
+            {
+                audioSource.Stop();
+            }
+            
+            audioSource.PlayOneShot(audioClip);
         }
     }
 }
