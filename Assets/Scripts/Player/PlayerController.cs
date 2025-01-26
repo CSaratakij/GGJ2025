@@ -15,12 +15,13 @@ namespace Game
     [RequireComponent(typeof(CharacterController))]
     public class PlayerController : MonoBehaviour, IKnockback
     {
+        public event Action OnDead;
+        
         private const float ALLOW_PLAYER_ROTATION = 0.1f;
         private const float DESIRED_ROTATION_SPEED = 0.1f;
         
         [Header("General")]
         [SerializeField] private int playerIndex = 0;
-        [SerializeField] private bool isImmobilize = false; // Test
         
         [Header("Setting - Normal Movement")]
         [SerializeField] private float moveSpeed = 5.0f;
@@ -79,15 +80,15 @@ namespace Game
         private float dashCooldownTimer = 0.0f;
         private Vector3 dashDirection = Vector3.forward;
         
-        // Immobilize Status
-        private bool IsImmobilize => isImmobilize;
-        
         // Punch
         private bool IsPunch => (Time.time <= punchTimer);
         private bool CanPunch => (Time.time >= punchCooldownTimer) && characterState.isGrounded && !IsKnockBack && !IsImmobilize && !IsDash && !IsPunch;
         private bool isPressedPunch = false;
         private float punchTimer = 0.0f;
         private float punchCooldownTimer = 0.0f;
+        
+        // Immobilize Status
+        private bool IsImmobilize => false;
         
         private Vector3 originalSpawnPosition;
         private CharacterState characterState;
@@ -154,10 +155,15 @@ namespace Game
             #endif
             */
         }
-
+        
         private void LateUpdate()
         {
             RotateHandler();
+        }
+
+        private void OnDestroy()
+        {
+            OnDead = null;
         }
 
         public void OnMove(InputAction.CallbackContext context)
@@ -186,6 +192,12 @@ namespace Game
             }
         }
 
+        public void ForceDead()
+        {
+            OnDead?.Invoke();
+            ResetCharacterState();
+        }
+        
         public void ResetCharacterState()
         {
             characterController.enabled = false;

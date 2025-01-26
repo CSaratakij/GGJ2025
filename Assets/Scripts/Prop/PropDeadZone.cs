@@ -10,7 +10,7 @@ namespace Game
             if (other.CompareTag("Player"))
             {
                 var playerController = other.gameObject.GetComponent<PlayerController>();
-                playerController.ResetCharacterState();
+                playerController.ForceDead();
             }
         }
     }
