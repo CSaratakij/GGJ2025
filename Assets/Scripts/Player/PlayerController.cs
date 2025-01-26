@@ -13,7 +13,7 @@ namespace Game
     }
     
     [RequireComponent(typeof(CharacterController))]
-    public class PlayerController : MonoBehaviour, IKnockback
+    public class PlayerController : MonoBehaviour, IKnockback, IImmobilize
     {
         public event Action OnDead;
         
@@ -42,6 +42,18 @@ namespace Game
         [SerializeField] private float punchDuration = 1.0f;
         [SerializeField] private float punchCooldown = 1.0f;
         [SerializeField] private LayerMask punchMask;
+        
+        [Header("Setting - Shoot")]
+        [SerializeField, Required, AssetsOnly] private GameObject bulletPrefab;
+        [SerializeField, Required] private Transform shootMuzzleOrigin;
+        [SerializeField] private float shootDuration = 1.0f;
+        [SerializeField] private float shootCooldown = 1.0f;
+        [SerializeField] private float bulletMoveSpeed = 0.25f;
+        [SerializeField] private float bulletLifeTime = 3.0f;
+        
+        [Header("Setting - Immobilize")]
+        [SerializeField] private float immobilizeDuration = 1.0f;
+        [SerializeField, Required] private Transform immobilizeVisualParent;
         
         [Header("Animation Smoothing")]
         [Range(0, 1f)] [SerializeField] private float horizontalAnimSmoothTime = 0.2f;
@@ -88,7 +100,11 @@ namespace Game
         private float punchCooldownTimer = 0.0f;
         
         // Immobilize Status
-        private bool IsImmobilize => false;
+        private bool IsImmobilize => (Time.time <= immobilizeTimer);
+        private float immobilizeTimer = 0.0f;
+        
+        // Invincible Status
+        private bool IsInvincible => IsDash;
         
         private Vector3 originalSpawnPosition;
         private CharacterState characterState;
@@ -137,7 +153,6 @@ namespace Game
             MoveHandler();
             SkillHandler();
 
-            /*
             #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
@@ -152,13 +167,21 @@ namespace Game
             {
                 Dash(transform.forward);
             }
+            else if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                Immobilize();
+            }
             #endif
-            */
         }
         
         private void LateUpdate()
         {
             RotateHandler();
+
+            if (immobilizeVisualParent)
+            {
+                immobilizeVisualParent.gameObject.SetActive(IsImmobilize);
+            }
         }
 
         private void OnDestroy()
@@ -338,6 +361,11 @@ namespace Game
             knockbackTimer = (Time.time + currentKnockbackSetting.knockbackDuration);
         }
 
+        public void ResetKnockback()
+        {
+            knockbackTimer = 0.0f;
+        }
+
         private void Dash(Vector3 dashDirection)
         {
             if (CanDash)
@@ -394,6 +422,16 @@ namespace Game
                     Debug.Log($"Punch : {target.gameObject.name}", target.gameObject);
                 }
             }
+        }
+
+        public void Immobilize()
+        {
+            if (IsImmobilize)
+            {
+                return;
+            }
+
+            immobilizeTimer = (Time.time + immobilizeDuration);
         }
     }
 }

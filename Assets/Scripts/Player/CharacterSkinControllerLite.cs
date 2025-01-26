@@ -5,7 +5,7 @@ namespace  Game
     public class CharacterSkinControllerLite : MonoBehaviour
     {
         Animator animator;
-        Renderer[] characterMaterials;
+        [SerializeField] private Renderer[] characterMaterials;
 
         public Texture2D[] albedoList;
         [ColorUsage(true,true)]
@@ -16,7 +16,7 @@ namespace  Game
         private void Awake()
         {
             animator = GetComponent<Animator>();
-            characterMaterials = GetComponentsInChildren<Renderer>();
+            //characterMaterials = GetComponentsInChildren<Renderer>();
         }
 
         /*
