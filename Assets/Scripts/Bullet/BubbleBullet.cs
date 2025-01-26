@@ -7,6 +7,9 @@ namespace Game
     {
         [Header("Setting")]
         [SerializeField] private float lifeTime = 3f;
+        
+        [Header("Dependencies")]
+        [SerializeField] private Renderer visualRenderer;
 
         public bool IsStartOperate => isStartOperate;
         public GameObject Owner => owner;
@@ -18,6 +21,7 @@ namespace Game
         private Rigidbody rigid;
         private GameObject owner = null;
         private bool isStartOperate = false;
+        private Color bulletColor;
         
         private void Awake()
         {
@@ -71,7 +75,7 @@ namespace Game
                     
                     if (shouldApplyImmobilizeEffect)
                     {
-                        immobilizeAffector.Immobilize();
+                        immobilizeAffector.Immobilize(bulletColor);
                     }
                     
                     lifeTimeTimer = 0.0f;
@@ -79,12 +83,21 @@ namespace Game
             }
         }
 
-        public void StartOperation(Vector3 moveDirection, float moveSpeed, float lifeTime, GameObject owner = null)
+        public void ApplyColor(Color color)
+        {
+            if (visualRenderer)
+            {
+                visualRenderer.material.SetColor("_BaseColor", color);
+            }
+        }
+        
+        public void StartOperation(Vector3 moveDirection, float moveSpeed, float lifeTime, Color bulletColor, GameObject owner = null)
         {
             this.moveDirection = moveDirection;
             this.moveSpeed = moveSpeed;
             this.owner = owner;
             this.lifeTime = lifeTime;
+            this.bulletColor = bulletColor;
             
             lifeTimeTimer = (Time.time + lifeTime);
             isMoveable = true;

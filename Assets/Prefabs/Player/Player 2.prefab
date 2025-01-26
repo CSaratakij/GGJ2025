@@ -52,6 +52,18 @@ PrefabInstance:
       propertyPath: playerIndex
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3272922413349150569, guid: 891658da86426b8478c4e14a9694bd04, type: 3}
+      propertyPath: playerColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3272922413349150569, guid: 891658da86426b8478c4e14a9694bd04, type: 3}
+      propertyPath: playerColor.g
+      value: 0.6627451
+      objectReference: {fileID: 0}
+    - target: {fileID: 3272922413349150569, guid: 891658da86426b8478c4e14a9694bd04, type: 3}
+      propertyPath: playerColor.r
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3541754002163558908, guid: 891658da86426b8478c4e14a9694bd04, type: 3}
       propertyPath: m_Name
       value: Player 2
@@ -59,6 +71,10 @@ PrefabInstance:
     - target: {fileID: 4136382765630129522, guid: 891658da86426b8478c4e14a9694bd04, type: 3}
       propertyPath: m_DefaultControlScheme
       value: Gamepad
+      objectReference: {fileID: 0}
+    - target: {fileID: 4136382765630129522, guid: 891658da86426b8478c4e14a9694bd04, type: 3}
+      propertyPath: m_NeverAutoSwitchControlSchemes
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

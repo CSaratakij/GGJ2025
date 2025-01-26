@@ -4,7 +4,7 @@ namespace Game
 {
     public interface IImmobilize
     {
-        void Immobilize();
+        void Immobilize(Color? color);
         bool CanImmobilize();
     }
 }

@@ -55,6 +55,7 @@ namespace Game
         
         [Header("Setting - Immobilize")]
         [SerializeField] private float immobilizeDuration = 1.0f;
+        [SerializeField] private Renderer visualImmobilizeRenderer;
         [SerializeField, Required] private Transform immobilizeVisualParent;
         
         [Header("Animation Smoothing")]
@@ -161,6 +162,7 @@ namespace Game
             characterSkinControllerLite.ChangeMaterialSettings(playerIndex);
             characterState.isMoveable = true;
             animator.SetTrigger("angry");
+            ApplyImmobilizeColor(GetPlayerColor(alpha: 0.5f));
         }
 
         private void Update()
@@ -410,7 +412,7 @@ namespace Game
             knockbackTimer = (Time.time + currentKnockbackSetting.knockbackDuration);
         }
 
-        public void Immobilize()
+        public void Immobilize(Color? color)
         {
             if (IsImmobilize)
             {
@@ -418,6 +420,11 @@ namespace Game
             }
 
             immobilizeTimer = (Time.time + immobilizeDuration);
+
+            if (color != null)
+            {
+                ApplyImmobilizeColor(color.Value);
+            }
         }
 
         public bool CanImmobilize()
@@ -502,7 +509,25 @@ namespace Game
             if (isValid)
             {
                 var bullet = Instantiate(bulletPrefab, shootMuzzleOrigin.transform.position, Quaternion.identity);
-                bullet.StartOperation(moveDirection: transform.forward.normalized, moveSpeed: bulletMoveSpeed, lifeTime: bulletLifeTime, owner: this.gameObject);
+                Color bulletColor = GetPlayerColor(alpha: 0.5f);
+                
+                bullet.ApplyColor(bulletColor);
+                bullet.StartOperation(moveDirection: transform.forward.normalized, moveSpeed: bulletMoveSpeed, lifeTime: bulletLifeTime, GetPlayerColor(alpha: 0.5f), owner: this.gameObject);
+            }
+        }
+
+        private Color GetPlayerColor(float alpha = 1.0f)
+        {
+            var newColor = PlayerColor;
+            newColor.a = alpha;
+            return newColor;
+        }
+        
+        public void ApplyImmobilizeColor(Color color)
+        {
+            if (visualImmobilizeRenderer)
+            {
+                visualImmobilizeRenderer.material.SetColor("_BaseColor", color);
             }
         }
     }

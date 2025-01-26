@@ -2441,6 +2441,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerIndex: 0
+  playerColor: {r: 1, g: 0, b: 0, a: 1}
   respawnInvincibleDuration: 1
   moveSpeed: 3
   gravity: -9.81
@@ -2473,6 +2474,7 @@ MonoBehaviour:
   bulletMoveSpeed: 2.5
   bulletLifeTime: 5
   immobilizeDuration: 1
+  visualImmobilizeRenderer: {fileID: 8115902795051353086}
   immobilizeVisualParent: {fileID: 8697716297535537247}
   horizontalAnimSmoothTime: 0.2
   verticalAnimTime: 0.2
