@@ -2521,7 +2521,7 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 9cf2bced-2f2a-4382-9487-40b0acfb92e5
     m_ActionName: 'Player/Shoot[/Keyboard/k]'
-  m_NeverAutoSwitchControlSchemes: 1
+  m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1

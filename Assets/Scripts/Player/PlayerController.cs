@@ -193,6 +193,7 @@ namespace Game
             MoveHandler();
             ActionActivationHandler();
 
+            /*
             #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
@@ -211,6 +212,7 @@ namespace Game
                 ShakeCamera();
             }
             #endif
+            */
         }
         
         private void LateUpdate()

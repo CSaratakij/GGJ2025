@@ -844,9 +844,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 317028530439941360, guid: 316eeea9278f4c748ba0c4bdfe0e5442, type: 3}
+      propertyPath: m_NeverAutoSwitchControlSchemes
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 875945242134642814, guid: 316eeea9278f4c748ba0c4bdfe0e5442, type: 3}
       propertyPath: m_Name
       value: Player 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 875945242134642814, guid: 316eeea9278f4c748ba0c4bdfe0e5442, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4214421843302937197, guid: 316eeea9278f4c748ba0c4bdfe0e5442, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1622,9 +1630,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 457508610688236318, guid: ae5bb7f348ef4cd4da281faeabbdc4d0, type: 3}
+      propertyPath: m_NeverAutoSwitchControlSchemes
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1015792484722759568, guid: ae5bb7f348ef4cd4da281faeabbdc4d0, type: 3}
       propertyPath: m_Name
       value: Player 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1015792484722759568, guid: ae5bb7f348ef4cd4da281faeabbdc4d0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4054233876128572803, guid: ae5bb7f348ef4cd4da281faeabbdc4d0, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2847,6 +2863,14 @@ PrefabInstance:
     - target: {fileID: 6206055736025766058, guid: efa5057bb857f2143a55e26ec469fddb, type: 3}
       propertyPath: m_Name
       value: Player 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6206055736025766058, guid: efa5057bb857f2143a55e26ec469fddb, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6800965976767542308, guid: efa5057bb857f2143a55e26ec469fddb, type: 3}
+      propertyPath: m_NeverAutoSwitchControlSchemes
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6952167043340806841, guid: efa5057bb857f2143a55e26ec469fddb, type: 3}
       propertyPath: m_LocalPosition.x
