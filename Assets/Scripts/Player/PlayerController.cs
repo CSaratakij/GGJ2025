@@ -151,7 +151,7 @@ namespace Game
         {
             AnimationHandler();
             MoveHandler();
-            SkillHandler();
+            ActionActivationHandler();
 
             #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -228,6 +228,11 @@ namespace Game
             characterController.enabled = true;
             knockbackTimer = 0.0f;
             dashTimer = 0.0f;
+        }
+
+        public void ResetKnockback()
+        {
+            knockbackTimer = 0.0f;
         }
 
         private void AnimationHandler()
@@ -324,7 +329,7 @@ namespace Game
             characterController.Move(velocity);
         }
 
-        private void SkillHandler()
+        private void ActionActivationHandler()
         {
             // Dash
             if (isPressedDash)
@@ -339,6 +344,9 @@ namespace Game
                 isPressedPunch = false;
                 Punch();
             }
+            
+            // Shoot
+            
         }
         
         private void RotateHandler()
@@ -361,11 +369,21 @@ namespace Game
             knockbackTimer = (Time.time + currentKnockbackSetting.knockbackDuration);
         }
 
-        public void ResetKnockback()
+        public void Immobilize()
         {
-            knockbackTimer = 0.0f;
+            if (IsImmobilize)
+            {
+                return;
+            }
+
+            immobilizeTimer = (Time.time + immobilizeDuration);
         }
 
+        public bool CanImmobilize()
+        {
+            return !IsInvincible;
+        }
+        
         private void Dash(Vector3 dashDirection)
         {
             if (CanDash)
@@ -424,14 +442,5 @@ namespace Game
             }
         }
 
-        public void Immobilize()
-        {
-            if (IsImmobilize)
-            {
-                return;
-            }
-
-            immobilizeTimer = (Time.time + immobilizeDuration);
-        }
     }
 }

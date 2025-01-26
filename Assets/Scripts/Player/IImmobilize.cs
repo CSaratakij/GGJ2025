@@ -5,5 +5,6 @@ namespace Game
     public interface IImmobilize
     {
         void Immobilize();
+        bool CanImmobilize();
     }
 }

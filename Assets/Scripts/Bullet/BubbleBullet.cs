@@ -55,8 +55,9 @@ namespace Game
                 if (shouldHit)
                 {
                     IImmobilize immobilizeAffector = other.GetComponent<IImmobilize>();
-
-                    if (immobilizeAffector != null)
+                    bool shouldApplyImmobilizeEffect = (immobilizeAffector != null) && (immobilizeAffector.CanImmobilize());
+                    
+                    if (shouldApplyImmobilizeEffect)
                     {
                         immobilizeAffector.Immobilize();
                     }
