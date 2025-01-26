@@ -22,6 +22,7 @@ namespace Game
         
         [Header("General")]
         [SerializeField] private int playerIndex = 0;
+        [SerializeField] private float respawnInvincibleDuration = 1.0f;
         
         [Header("Setting - Normal Movement")]
         [SerializeField] private float moveSpeed = 5.0f;
@@ -44,7 +45,7 @@ namespace Game
         [SerializeField] private LayerMask punchMask;
         
         [Header("Setting - Shoot")]
-        [SerializeField, Required, AssetsOnly] private GameObject bulletPrefab;
+        [SerializeField, Required, AssetsOnly] private BubbleBullet bulletPrefab;
         [SerializeField, Required] private Transform shootMuzzleOrigin;
         [SerializeField] private float shootDuration = 1.0f;
         [SerializeField] private float shootCooldown = 1.0f;
@@ -77,12 +78,16 @@ namespace Game
             public float knockbackDuration;
             public Vector3 knockbackDirection;
         }
-        
+
         // Knockback Status
         private bool IsKnockBack => (Time.time <= knockbackTimer);
         private float knockbackTimer = 0.0f;
         private KnockBackType currentKnockBackType = KnockBackType.Normal;
         private KnockBackSetting currentKnockbackSetting;
+        
+        // Immobilize Status
+        private bool IsImmobilize => (Time.time <= immobilizeTimer);
+        private float immobilizeTimer = 0.0f;
         
         // Dash Status
         private bool IsDash => (Time.time <= dashTimer);
@@ -99,12 +104,16 @@ namespace Game
         private float punchTimer = 0.0f;
         private float punchCooldownTimer = 0.0f;
         
-        // Immobilize Status
-        private bool IsImmobilize => (Time.time <= immobilizeTimer);
-        private float immobilizeTimer = 0.0f;
+        // Shoot
+        private bool IsShoot => (Time.time <= shootTimer);
+        private bool CanShoot => (Time.time >= shootCooldownTimer) && characterState.isGrounded && !IsKnockBack && !IsImmobilize && !IsDash && !IsPunch && !IsShoot;
+        private bool isPressedShoot = false;
+        private float shootTimer = 0.0f;
+        private float shootCooldownTimer = 0.0f;
         
         // Invincible Status
-        private bool IsInvincible => IsDash;
+        private bool IsInvincible => (Time.time <= respawnInvincibleTimer) || IsDash;
+        private float respawnInvincibleTimer = 0.0f;
         
         private Vector3 originalSpawnPosition;
         private CharacterState characterState;
@@ -189,6 +198,20 @@ namespace Game
             OnDead = null;
         }
 
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("Bullet"))
+            {
+                BubbleBullet bullet = other.GetComponent<BubbleBullet>();
+                bool shouldForceBulletToStop = bullet.IsStartOperate && (bullet.Owner != this.gameObject) && IsInvincible;
+
+                if (shouldForceBulletToStop)
+                {
+                    bullet.ForceStopOperation();
+                }
+            }
+        }
+
         public void OnMove(InputAction.CallbackContext context)
         {
             inputVector = context.ReadValue<Vector2>();
@@ -215,24 +238,28 @@ namespace Game
             }
         }
 
+        public void OnShoot(InputAction.CallbackContext context)
+        {
+            if (!isPressedShoot)
+            {
+                isPressedShoot = true;
+            }
+        }
+
         public void ForceDead()
         {
             OnDead?.Invoke();
-            ResetCharacterState();
+            Respawn();
         }
         
-        public void ResetCharacterState()
+        public void Respawn()
         {
             characterController.enabled = false;
             transform.position = originalSpawnPosition;
             characterController.enabled = true;
             knockbackTimer = 0.0f;
             dashTimer = 0.0f;
-        }
-
-        public void ResetKnockback()
-        {
-            knockbackTimer = 0.0f;
+            respawnInvincibleTimer = (Time.time + respawnInvincibleDuration);
         }
 
         private void AnimationHandler()
@@ -346,7 +373,11 @@ namespace Game
             }
             
             // Shoot
-            
+            if (isPressedShoot)
+            {
+                isPressedShoot = false;
+                Shoot();
+            }
         }
         
         private void RotateHandler()
@@ -442,5 +473,27 @@ namespace Game
             }
         }
 
+        private void Shoot()
+        {
+            if (!CanShoot)
+            {
+                Debug.Log($"Cannot shoot");
+                return;
+            }
+            
+            shootTimer = (Time.time + shootDuration);
+            shootCooldownTimer = (Time.time + shootCooldown);
+            
+            animator.ResetTrigger("shoot");
+            animator.SetTrigger("shoot");
+
+            bool isValid = (shootMuzzleOrigin != null) && (bulletPrefab != null);
+
+            if (isValid)
+            {
+                var bullet = Instantiate(bulletPrefab, shootMuzzleOrigin.transform.position, Quaternion.identity);
+                bullet.StartOperation(moveDirection: transform.forward.normalized, moveSpeed: bulletMoveSpeed, lifeTime: bulletLifeTime, owner: this.gameObject);
+            }
+        }
     }
 }

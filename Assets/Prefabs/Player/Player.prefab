@@ -2407,6 +2407,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: ed5ff87d-d011-4ddd-a23c-ff67eaeed916
     m_ActionName: 'Player/Punch[/Keyboard/e]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3272922413349150569}
+        m_TargetAssemblyTypeName: Game.PlayerController, Game
+        m_MethodName: OnShoot
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 9cf2bced-2f2a-4382-9487-40b0acfb92e5
+    m_ActionName: 'Player/Shoot[/Keyboard/k]'
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
@@ -2425,11 +2441,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerIndex: 0
+  respawnInvincibleDuration: 1
   moveSpeed: 3
   gravity: -9.81
   knockBackSettings:
   - knockBackType: 0
-    knockbackSpeed: 8
+    knockbackSpeed: 9
     knockbackSpeedMultipiler: 1
     knockbackDuration: 0.25
     knockbackDirection: {x: 0, y: 0, z: -1}
@@ -2449,13 +2466,13 @@ MonoBehaviour:
   punchMask:
     serializedVersion: 2
     m_Bits: 128
-  bulletPrefab: {fileID: 2202014246680013682, guid: 1181e5a6224bc7e4eb2f49162d49b205, type: 3}
+  bulletPrefab: {fileID: 5426811510209361693, guid: 1181e5a6224bc7e4eb2f49162d49b205, type: 3}
   shootMuzzleOrigin: {fileID: 4816562564820551068}
   shootDuration: 1
-  shootCooldown: 1
-  bulletMoveSpeed: 1
-  bulletLifeTime: 1
-  immobilizeDuration: 2
+  shootCooldown: 0.85
+  bulletMoveSpeed: 2.5
+  bulletLifeTime: 5
+  immobilizeDuration: 1
   immobilizeVisualParent: {fileID: 8697716297535537247}
   horizontalAnimSmoothTime: 0.2
   verticalAnimTime: 0.2
