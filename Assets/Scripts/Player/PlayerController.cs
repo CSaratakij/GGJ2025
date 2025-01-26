@@ -22,6 +22,7 @@ namespace Game
         
         [Header("General")]
         [SerializeField] private int playerIndex = 0;
+        [SerializeField] private Color playerColor = Color.white;
         [SerializeField] private float respawnInvincibleDuration = 1.0f;
         
         [Header("Setting - Normal Movement")]
@@ -57,13 +58,14 @@ namespace Game
         [SerializeField, Required] private Transform immobilizeVisualParent;
         
         [Header("Animation Smoothing")]
-        [Range(0, 1f)] [SerializeField] private float horizontalAnimSmoothTime = 0.2f;
-        [Range(0, 1f)] [SerializeField] private float verticalAnimTime = 0.2f;
-        [Range(0,1f)] [SerializeField] private float startAnimTime = 0.3f;
-        [Range(0, 1f)] [SerializeField] private float stopAnimTime = 0.15f;
+        [Range(0.0f, 1.0f)] [SerializeField] private float horizontalAnimSmoothTime = 0.2f;
+        [Range(0.0f, 1.0f)] [SerializeField] private float verticalAnimTime = 0.2f;
+        [Range(0.0f, 1.0f)] [SerializeField] private float startAnimTime = 0.3f;
+        [Range(0.0f, 1.0f)] [SerializeField] private float stopAnimTime = 0.15f;
         
         public int PlayerIndex => playerIndex;
         public int KnockBackCauserPlayerIndex => knockbackCauserPlayerIndex;
+        public Color PlayerColor => playerColor;
 
         [Serializable]
         public struct CharacterState
