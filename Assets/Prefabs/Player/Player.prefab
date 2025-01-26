@@ -392,6 +392,37 @@ SkinnedMeshRenderer:
     m_Center: {x: 0, y: 0.0138211055, z: -0.0015498907}
     m_Extent: {x: 0.026481798, y: 0.0027623707, z: 0.004100331}
   m_DirtyAABB: 0
+--- !u!1 &525553891223535307
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8409592134953121426}
+  m_Layer: 0
+  m_Name: PunchOrigin
+  m_TagString: Untagged
+  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8409592134953121426
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 525553891223535307}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.7, z: 0.52}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 539745478100655087}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &637568496683789415
 GameObject:
   m_ObjectHideFlags: 0
@@ -1941,12 +1972,13 @@ GameObject:
   - component: {fileID: 539745478100655087}
   - component: {fileID: 7635726066119915157}
   - component: {fileID: 4757836856755875627}
+  - component: {fileID: 3120386683269080138}
   - component: {fileID: 1262780011034836794}
   - component: {fileID: 4136382765630129522}
   - component: {fileID: 3272922413349150569}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1964,6 +1996,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 8409592134953121426}
   - {fileID: 8447345114822805049}
   - {fileID: 8231537208724914221}
   - {fileID: 2342561958175109603}
@@ -2039,6 +2072,27 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.98, z: 0}
+--- !u!65 &3120386683269080138
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3541754002163558908}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 2, z: 1}
+  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!114 &1262780011034836794
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2191,6 +2245,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 856a27d9-caa3-43ca-a103-89b8f617fd00
     m_ActionName: 'Player/Dash[/Keyboard/space]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3272922413349150569}
+        m_TargetAssemblyTypeName: Game.PlayerController, Game
+        m_MethodName: OnPunch
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: ed5ff87d-d011-4ddd-a23c-ff67eaeed916
+    m_ActionName: 'Player/Punch[/Keyboard/e]'
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
@@ -2226,6 +2296,13 @@ MonoBehaviour:
   dashMoveSpeedMultipiler: 1
   dashDuration: 0.15
   dashCooldown: 1
+  punchHitboxOrigin: {fileID: 8409592134953121426}
+  punchHitboxRadius: 0.5
+  punchDuration: 0.5
+  punchCooldown: 1
+  punchMask:
+    serializedVersion: 2
+    m_Bits: 128
   horizontalAnimSmoothTime: 0.2
   verticalAnimTime: 0.2
   startAnimTime: 0.3

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,13 +13,14 @@ namespace Game
     }
     
     [RequireComponent(typeof(CharacterController))]
-    public class PlayerController : MonoBehaviour
+    public class PlayerController : MonoBehaviour, IKnockback
     {
         private const float ALLOW_PLAYER_ROTATION = 0.1f;
         private const float DESIRED_ROTATION_SPEED = 0.1f;
         
         [Header("General")]
         [SerializeField] private int playerIndex = 0;
+        [SerializeField] private bool isImmobilize = false; // Test
         
         [Header("Setting - Normal Movement")]
         [SerializeField] private float moveSpeed = 5.0f;
@@ -32,6 +34,13 @@ namespace Game
         [SerializeField] float dashMoveSpeedMultipiler = 1.0f;
         [SerializeField] float dashDuration = 1.0f;
         [SerializeField] float dashCooldown = 1.0f;
+
+        [Header("Setting - Punch")]
+        [SerializeField, Required] private Transform punchHitboxOrigin;
+        [SerializeField, Required] private float punchHitboxRadius = 1.0f;
+        [SerializeField] private float punchDuration = 1.0f;
+        [SerializeField] private float punchCooldown = 1.0f;
+        [SerializeField] private LayerMask punchMask;
         
         [Header("Animation Smoothing")]
         [Range(0, 1f)] [SerializeField] private float horizontalAnimSmoothTime = 0.2f;
@@ -64,15 +73,23 @@ namespace Game
         
         // Dash Status
         private bool IsDash => (Time.time <= dashTimer);
-        private bool CanDash => (Time.time >= dashCooldownTimer) && characterState.isMoveable && characterState.isGrounded && !IsKnockBack && !IsImmobilize && !IsDash;
+        private bool CanDash => (Time.time >= dashCooldownTimer) && characterState.isMoveable && characterState.isGrounded && !IsKnockBack && !IsImmobilize && !IsDash && !IsPunch;
         private bool isPressedDash = false;
         private float dashTimer = 0.0f;
         private float dashCooldownTimer = 0.0f;
         private Vector3 dashDirection = Vector3.forward;
         
         // Immobilize Status
-        private bool IsImmobilize => false; // TODO
+        private bool IsImmobilize => isImmobilize;
         
+        // Punch
+        private bool IsPunch => (Time.time <= punchTimer);
+        private bool CanPunch => (Time.time >= punchCooldownTimer) && characterState.isGrounded && !IsKnockBack && !IsImmobilize && !IsDash && !IsPunch;
+        private bool isPressedPunch = false;
+        private float punchTimer = 0.0f;
+        private float punchCooldownTimer = 0.0f;
+        
+        private Vector3 originalSpawnPosition;
         private CharacterState characterState;
         private Vector2 gravityVector;
         private Vector3 inputVector;
@@ -83,6 +100,17 @@ namespace Game
         private CharacterController characterController;
         private CharacterSkinControllerLite characterSkinControllerLite;
         private PlayerInput playerInput;
+        
+        #if UNITY_EDITOR
+        private void OnDrawGizmos()
+        {
+            if (punchHitboxOrigin)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(punchHitboxOrigin.position, punchHitboxRadius);
+            }
+        }
+        #endif
         
         private void Awake()
         {
@@ -95,6 +123,7 @@ namespace Game
         private void Start()
         {
             mainCamera = Camera.main;
+            originalSpawnPosition = transform.position;
             lastNonZeroDesiredMoveDirection = Vector3.forward;
             characterSkinControllerLite.ChangeMaterialSettings(playerIndex);
             characterState.isMoveable = true;
@@ -107,6 +136,7 @@ namespace Game
             MoveHandler();
             SkillHandler();
 
+            /*
             #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
@@ -122,6 +152,7 @@ namespace Game
                 Dash(transform.forward);
             }
             #endif
+            */
         }
 
         private void LateUpdate()
@@ -147,15 +178,26 @@ namespace Game
             }
         }
 
-        // TODO : for respawn
+        public void OnPunch(InputAction.CallbackContext context)
+        {
+            if (!isPressedPunch)
+            {
+                isPressedPunch = true;
+            }
+        }
+
         public void ResetCharacterState()
         {
-            
+            characterController.enabled = false;
+            transform.position = originalSpawnPosition;
+            characterController.enabled = true;
+            knockbackTimer = 0.0f;
+            dashTimer = 0.0f;
         }
 
         private void AnimationHandler()
         {
-            bool shouldBlendAnimationMoveSpeed = (characterState.isMoveable && !IsKnockBack);
+            bool shouldBlendAnimationMoveSpeed = (characterState.isMoveable && !IsKnockBack && !IsPunch);
 
             if (shouldBlendAnimationMoveSpeed)
             {
@@ -195,8 +237,15 @@ namespace Game
             
             bool shouldUseKnockback = (Time.time <= knockbackTimer);
             bool shouldUseDash = (Time.time <= dashTimer);
+            bool shouldStandStill = (IsImmobilize && !IsKnockBack) || IsPunch;
             
-            if (shouldUseKnockback)
+            if (shouldStandStill)
+            {
+                 currentMoveDirection = Vector3.zero;
+                 currentMoveSpeed = 0.0f;
+                 currentMoveSpeedMultiplier = 1.0f;               
+            }
+            else if (shouldUseKnockback)
             {
                 currentMoveDirection = currentKnockbackSetting.knockbackDirection;
                 currentMoveSpeed = currentKnockbackSetting.knockbackSpeed;
@@ -250,6 +299,11 @@ namespace Game
             }
             
             // Punch
+            if (isPressedPunch)
+            {
+                isPressedPunch = false;
+                Punch();
+            }
         }
         
         private void RotateHandler()
@@ -258,7 +312,13 @@ namespace Game
             transform.rotation = Quaternion.Slerp (transform.rotation, lookDirection, DESIRED_ROTATION_SPEED);
         }
 
-        public void Knockback(Vector3 knockbackDirection, KnockBackType knockbackType)
+        public void Knockback(Vector3 knockbackDirection)
+        {
+            var knockbackType = IsImmobilize ? KnockBackType.High : KnockBackType.Normal;
+            Knockback(knockbackDirection, knockbackType);
+        }
+
+        private void Knockback(Vector3 knockbackDirection, KnockBackType knockbackType)
         {
             currentKnockBackType = knockbackType;
             currentKnockbackSetting = knockBackSettings.FirstOrDefault(x => x.knockBackType == knockbackType);
@@ -266,13 +326,61 @@ namespace Game
             knockbackTimer = (Time.time + currentKnockbackSetting.knockbackDuration);
         }
 
-        public void Dash(Vector3 dashDirection)
+        private void Dash(Vector3 dashDirection)
         {
             if (CanDash)
             {
                 this.dashDirection = dashDirection;
                 dashTimer = (Time.time + dashDuration);
                 dashCooldownTimer = (Time.time + dashCooldown);
+            }
+        }
+
+        public void Punch()
+        {
+            if (!CanPunch)
+            {
+                return;
+            }
+            
+            punchTimer = (Time.time + punchDuration);
+            punchCooldown = (Time.time + punchCooldown);
+            
+            animator.ResetTrigger("punch");
+            animator.SetTrigger("punch");
+            
+            // Hit Checks
+            Collider[] hits = Physics.OverlapSphere(punchHitboxOrigin.transform.position, punchHitboxRadius, punchMask, QueryTriggerInteraction.Collide);
+            
+            if (hits.Length > 0)
+            {
+                for (int i = 0; i < hits.Length; i++)
+                {
+                    bool isSelf = hits[i].gameObject == this.gameObject;
+
+                    if (isSelf)
+                    {
+                        continue;
+                    }
+
+                    Collider target = hits[i];
+                    IKnockback knockbackAffector = target.gameObject.GetComponent<IKnockback>();
+
+                    if (knockbackAffector != null)
+                    {
+                        Vector3 knockbackDirection = (target.gameObject.transform.position - transform.position);
+                        knockbackDirection.y = 0;
+
+                        if (knockbackDirection.magnitude > 1.0f)
+                        {
+                            knockbackDirection.Normalize();
+                        }
+                        
+                        knockbackAffector.Knockback(knockbackDirection);
+                    }
+                    
+                    Debug.Log($"Punch : {target.gameObject.name}", target.gameObject);
+                }
             }
         }
     }
